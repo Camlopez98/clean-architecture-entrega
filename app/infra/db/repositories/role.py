@@ -1,32 +1,50 @@
 from typing import Optional
-from sqlmodel import Session, select
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.core.entities.role import Role as RoleEntity
 from app.core.ports.role import RoleRepositoryPort
+from app.core.entities.role import Role
 from app.infra.db.models.role import Role as RoleModel
 
 
 class RoleRepository(RoleRepositoryPort):
-    def __init__(self, session: Session):
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
-    def create(self, role: RoleEntity) -> RoleEntity:
-        db_role = RoleModel(name=role.name, description=role.description)
+    async def create(self, role: Role) -> Role:
+        db_role = RoleModel(
+            name=role.name,
+            description=role.description,
+        )
         self.session.add(db_role)
-        self.session.commit()
-        self.session.refresh(db_role)
-        return RoleEntity(id=db_role.id, name=db_role.name, description=db_role.description)
+        await self.session.commit()
+        await self.session.refresh(db_role)
+        return Role(
+            id=db_role.id,
+            name=db_role.name,
+            description=db_role.description,
+        )
 
-    def get_by_id(self, role_id: int) -> Optional[RoleEntity]:
+    async def get_by_id(self, role_id: int) -> Optional[Role]:
         statement = select(RoleModel).where(RoleModel.id == role_id)
-        db_role = self.session.exec(statement).first()
+        result = await self.session.exec(statement)
+        db_role = result.first()
         if not db_role:
             return None
-        return RoleEntity(id=db_role.id, name=db_role.name, description=db_role.description)
+        return Role(
+            id=db_role.id,
+            name=db_role.name,
+            description=db_role.description,
+        )
 
-    def get_by_name(self, name: str) -> Optional[RoleEntity]:
+    async def get_by_name(self, name: str) -> Optional[Role]:
         statement = select(RoleModel).where(RoleModel.name == name)
-        db_role = self.session.exec(statement).first()
+        result = await self.session.exec(statement)
+        db_role = result.first()
         if not db_role:
             return None
-        return RoleEntity(id=db_role.id, name=db_role.name, description=db_role.description)
+        return Role(
+            id=db_role.id,
+            name=db_role.name,
+            description=db_role.description,
+        )

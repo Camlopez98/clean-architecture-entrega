@@ -4,11 +4,15 @@ from app.core.ports.role import RoleRepositoryPort
 
 
 class GetRoleByIdUseCase:
-    def __init__(self, role_repository: RoleRepositoryPort):
+    def __init__(self, role_repository: RoleRepositoryPort) -> None:
         self.role_repository = role_repository
 
-    def execute(self, role_id: int) -> Optional[RoleResponseDTO]:
-        role = self.role_repository.get_by_id(role_id)
+    async def execute(self, role_id: int) -> Optional[RoleResponseDTO]:
+        role = await self.role_repository.get_by_id(role_id)
         if not role:
             return None
-        return RoleResponseDTO.model_validate(role)
+        return RoleResponseDTO(
+            id=role.id,
+            name=role.name,
+            description=role.description,
+        )

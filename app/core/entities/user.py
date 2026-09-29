@@ -14,6 +14,7 @@ class User:
     name: str
     email: Email
     password: Password
+    role_id: Optional[int] = None
     role: Optional[Role] = None
 
     def __post_init__(self):

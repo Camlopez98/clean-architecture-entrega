@@ -19,18 +19,6 @@ class CreateUserUsecase:
     hasher: Hasher
 
     async def execute(self, dto: CreateUserRequest) -> UserResponse:
-        """Creates a new user if the email doesn't already exist.
-
-        Args:
-            dto (CreateUserRequest): The data to create the user with.
-
-        Returns:
-            UserResponse: The created user.
-
-        Raises:
-            InvalidUserError: If the input data to create the user is invalid.
-            UserAlreadyExistsError: If a user with the same email already exists.
-        """
         try:
             email, password = Email(dto.email), Password(dto.password)
         except (InvalidEmailError, InvalidPasswordError) as e:
@@ -48,7 +36,13 @@ class CreateUserUsecase:
                 name=dto.name,
                 email=email,
                 password=Password(hashed_password),
+                role_id=dto.role_id,
             )
 
             await self.uow.user_repo.save(user)
-            return UserResponse(id=str(user.id), name=user.name, email=user.email.value)
+            return UserResponse(
+                id=str(user.id),
+                name=user.name,
+                email=user.email.value,
+                role_id=user.role_id,
+            )

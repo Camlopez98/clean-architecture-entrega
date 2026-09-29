@@ -2,8 +2,8 @@ from typing import Optional
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.core.ports.role import RoleRepositoryPort
 from app.core.entities.role import Role
+from app.core.ports.role import RoleRepositoryPort
 from app.infra.db.models.role import Role as RoleModel
 
 
@@ -48,8 +48,8 @@ class RoleRepository(RoleRepositoryPort):
             name=db_role.name,
             description=db_role.description,
         )
-        
-async def update(self, role: Role) -> Role:
+
+    async def update(self, role: Role) -> Role:
         statement = select(RoleModel).where(RoleModel.id == role.id)
         result = await self.session.exec(statement)
         db_role = result.first()
@@ -69,7 +69,7 @@ async def update(self, role: Role) -> Role:
             description=db_role.description,
         )
 
-async def delete(self, role_id: int) -> bool:
+    async def delete(self, role_id: int) -> bool:
         statement = select(RoleModel).where(RoleModel.id == role_id)
         result = await self.session.exec(statement)
         db_role = result.first()

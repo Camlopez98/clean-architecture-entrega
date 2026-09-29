@@ -48,3 +48,34 @@ class RoleRepository(RoleRepositoryPort):
             name=db_role.name,
             description=db_role.description,
         )
+        
+async def update(self, role: Role) -> Role:
+        statement = select(RoleModel).where(RoleModel.id == role.id)
+        result = await self.session.exec(statement)
+        db_role = result.first()
+        if not db_role:
+            raise ValueError(f"Role with id {role.id} not found")
+
+        db_role.name = role.name
+        db_role.description = role.description
+
+        self.session.add(db_role)
+        await self.session.commit()
+        await self.session.refresh(db_role)
+
+        return Role(
+            id=db_role.id,
+            name=db_role.name,
+            description=db_role.description,
+        )
+
+async def delete(self, role_id: int) -> bool:
+        statement = select(RoleModel).where(RoleModel.id == role_id)
+        result = await self.session.exec(statement)
+        db_role = result.first()
+        if not db_role:
+            return False
+
+        await self.session.delete(db_role)
+        await self.session.commit()
+        return True

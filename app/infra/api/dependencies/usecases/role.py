@@ -4,7 +4,9 @@ from fastapi import Depends
 
 from app.core.ports.role import RoleRepositoryPort
 from app.core.usecases.role.create_role import CreateRoleUseCase
+from app.core.usecases.role.delete_role import DeleteRoleUseCase
 from app.core.usecases.role.get_role_by_id import GetRoleByIdUseCase
+from app.core.usecases.role.update_role import UpdateRoleUseCase
 from app.infra.db import async_session
 from app.infra.db.repositories.role import RoleRepository
 
@@ -25,5 +27,15 @@ def get_role_by_id_usecase(repo: Repo) -> GetRoleByIdUseCase:
     return GetRoleByIdUseCase(role_repository=repo)
 
 
+def get_update_role_usecase(repo: Repo) -> UpdateRoleUseCase:
+    return UpdateRoleUseCase(role_repository=repo)
+
+
+def get_delete_role_usecase(repo: Repo) -> DeleteRoleUseCase:
+    return DeleteRoleUseCase(role_repository=repo)
+
+
 CreateRole = Annotated[CreateRoleUseCase, Depends(get_create_role_usecase)]
 GetRoleById = Annotated[GetRoleByIdUseCase, Depends(get_role_by_id_usecase)]
+UpdateRole = Annotated[UpdateRoleUseCase, Depends(get_update_role_usecase)]
+DeleteRole = Annotated[DeleteRoleUseCase, Depends(get_delete_role_usecase)]
